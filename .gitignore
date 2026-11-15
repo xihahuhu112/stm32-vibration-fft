@@ -1,0 +1,39 @@
+# ===== 第三方库（体积大，不入库，还原方法见 docs/03-编译与环境.md）=====
+/Drivers/
+
+# ===== Keil MDK 构建产物 =====
+MDK-ARM/*/Objects/
+MDK-ARM/*/Listings/
+MDK-ARM/*/*.hex
+MDK-ARM/*/*.axf
+MDK-ARM/*/*.map
+MDK-ARM/*/*.dep
+MDK-ARM/*/*.lnp
+MDK-ARM/*/*.htm
+MDK-ARM/*/*.sct
+MDK-ARM/*/*.iex
+MDK-ARM/*/*.lst
+MDK-ARM/*/*.o
+MDK-ARM/*/*.d
+MDK-ARM/*/*.crf
+MDK-ARM/*/*.__i
+MDK-ARM/*/*.bak
+MDK-ARM/build.log
+MDK-ARM/*.lst
+MDK-ARM/*.htm
+MDK-ARM/*.dep
+MDK-ARM/DebugConfig/
+MDK-ARM/RTE/
+*.uvguix.*
+*.bak
+*.tmp
+
+# ===== 个人工作文档（只在本地用，不进公开仓库）=====
+采购清单.md
+进度与接线说明.md
+烧录与实测步骤.md
+答辩口述稿与演示清单.md
+
+# ===== 备份与草稿 =====
+*_backup_*/
+.generated/
