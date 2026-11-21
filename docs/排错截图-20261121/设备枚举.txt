@@ -1,0 +1,21 @@
+
+
+Status       : OK
+Class        : USB
+FriendlyName : USB Mass Storage Device
+InstanceId   : USB\VID_0483&PID_5720\00000000001B
+
+Status       : OK
+Class        : USBDevice
+FriendlyName : STM32 STLink
+InstanceId   : USB\VID_0483&PID_3748\000000000001
+
+
+
+
+DeviceID VolumeName Size
+-------- ---------- ----
+F:                      
+G:                      
+
+

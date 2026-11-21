@@ -58,6 +58,18 @@ static float    mag_buf[FFT_HALF + 1];
 
 static uint32_t peak_bin = 0;      /* index of the strongest spectral line */
 static float    peak_hz  = 0.0f;   /* that line converted to Hz            */
+
+/* ---- idle / active detection thresholds ---------------------------------
+ * amplitude unit: FFT magnitude in accelerometer LSB (+-4g, 8192 LSB/g).
+ * PEAK_RATIO : the peak line must exceed the noise-floor mean by this factor
+ * PEAK_FLOOR : absolute peak magnitude floor (LSB), rejects near-zero blocks
+ * RMS_FLOOR  : time-domain RMS floor (LSB), rejects tiny idle motion
+ * If a block fails either test it is reported as idle (PEAK = 0.0 Hz).
+ * Tune these three constants together if idle still shows a fake peak,
+ * or a light tap fails to trigger.                                          */
+#define PEAK_RATIO    3.5f
+#define PEAK_FLOOR    6.0f
+#define RMS_FLOOR     8.0f
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -193,6 +205,9 @@ int main(void)
     /* USER CODE BEGIN 3 */
     uint32_t n;
     float absmax, mmax, v;
+    float mag_max, mag_sum, mag_mean, rms;
+    uint32_t k, bin_max, n_bins;
+    uint8_t active;
     float *sampled;
     int16_t x, y, yprev, bar_x;
     uint16_t bar_h;
@@ -220,8 +235,48 @@ int main(void)
     FFT_HannWindow(fft_re, FFT_N);                      /* reduce leakage */
     FFT_Spectrum(fft_re, mag_buf, FFT_N);               /* CMSIS-DSP real FFT */
 
-    peak_bin = FFT_PeakBin(mag_buf, 2, 120);            /* ignore DC, look at 2..117Hz */
-    peak_hz = (float)peak_bin * (FFT_FS / (float)FFT_N);
+    /* ============ 2.5) idle / active detection ==========================
+     * A real vibration shows up both as a time-domain energy rise and as a
+     * single spectral line standing out above the noise floor.  Pure sensor
+     * noise has no outstanding line, so we reject it as idle instead of
+     * reporting the biggest random noise bin as a frequency.               */
+    rms = 0.0f;
+    for (n = 0; n < FFT_N; n++)
+    {
+        rms += sample_buf[n] * sample_buf[n];
+    }
+    rms = sqrtf(rms / (float)FFT_N);
+
+    mag_max = 0.0f;
+    mag_sum = 0.0f;
+    bin_max = 2;
+    n_bins  = 0;
+    for (k = 2; k <= 120; k++)                          /* 2 .. 117 Hz */
+    {
+        if (mag_buf[k] > mag_max)
+        {
+            mag_max = mag_buf[k];
+            bin_max = k;
+        }
+        mag_sum += mag_buf[k];
+        n_bins++;
+    }
+    mag_mean = mag_sum / (float)n_bins;
+
+    active = (mag_max >= PEAK_RATIO * mag_mean) &&
+             (mag_max >= PEAK_FLOOR) &&
+             (rms >= RMS_FLOOR);
+
+    if (active)
+    {
+        peak_bin = bin_max;
+        peak_hz  = (float)peak_bin * (FFT_FS / (float)FFT_N);
+    }
+    else
+    {
+        peak_bin = 0;
+        peak_hz  = 0.0f;
+    }
 
     /* ============ 3) draw on the OLED ============ */
     OLED_Clear();
@@ -236,7 +291,7 @@ int main(void)
     OLED_String(48, 8, "N=1024");
 
     /* time domain waveform, area y=16..36 */
-    absmax = 1.0f;
+    absmax = 30.0f;   /* fixed floor: idle noise is not blown up full screen */
     for (n = 0; n < FFT_N; n += 8)
     {
       v = fabsf(sample_buf[n]);
@@ -258,7 +313,7 @@ int main(void)
     }
 
     /* spectrum bars, area y=40..62, bin 1..63 -> 1Hz..61Hz */
-    mmax = 0.000001f;
+    mmax = 3.0f;      /* floor so idle noise bars stay short */
     for (n = 1; n <= 63; n++)
     {
       if (mag_buf[n] > mmax)
@@ -276,7 +331,10 @@ int main(void)
     OLED_HLine(0, 63, 128);
 
     OLED_Refresh();
-    UART1_PrintPeak(peak_bin, peak_hz);
+    if (active)
+        UART1_PrintPeak(peak_bin, peak_hz);
+    else
+        UART1_Print("IDLE\r\n");
   }
   /* USER CODE END 3 */
 }

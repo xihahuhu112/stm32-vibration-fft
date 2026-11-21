@@ -1,0 +1,53 @@
+=== pyOCD 连接尝试 ===
+$ python -m pyocd commander -t cortex_m
+
+probe: STMicroelectronics STM32 STLink 000000000000000000000001
+fw: V2J48M7 VDD: 3.295
+STLink error (9): Get IDCODE error
+Traceback (most recent call last):
+  File "C:\Users\hs\AppData\Local\Doubao\User Data\sandbox_runtime\bases\fa694f517e5995233c80a9a8db5212c2\python\Lib\site-packages\pyocd\coresight\dap.py", line 469, in _connect
+    probe_conn.connect(self._protocol)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "C:\Users\hs\AppData\Local\Doubao\User Data\sandbox_runtime\bases\fa694f517e5995233c80a9a8db5212c2\python\Lib\site-packages\pyocd\coresight\dap.py", line 178, in connect
+    self._connect_probe(protocol)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "C:\Users\hs\AppData\Local\Doubao\User Data\sandbox_runtime\bases\fa694f517e5995233c80a9a8db5212c2\python\Lib\site-packages\pyocd\coresight\dap.py", line 195, in _connect_probe
+    self._probe.connect(protocol)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "C:\Users\hs\AppData\Local\Doubao\User Data\sandbox_runtime\bases\fa694f517e5995233c80a9a8db5212c2\python\Lib\site-packages\pyocd\probe\stlink_probe.py", line 187, in connect
+    self._link.enter_debug(STLink.Protocol.SWD)
+    ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\hs\AppData\Local\Doubao\User Data\sandbox_runtime\bases\fa694f517e5995233c80a9a8db5212c2\python\Lib\site-packages\pyocd\probe\stlink\stlink.py", line 343, in enter_debug
+    self._check_status(response)
+    ~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+  File "C:\Users\hs\AppData\Local\Doubao\User Data\sandbox_runtime\bases\fa694f517e5995233c80a9a8db5212c2\python\Lib\site-packages\pyocd\probe\stlink\stlink.py", line 381, in _check_status
+    raise exceptions.ProbeError(error_message)
+pyocd.core.exceptions.ProbeError: STLink error (9): Get IDCODE error
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\hs\AppData\Local\Temp\pyocd_capture.py", line 8, in <module>
+    s.open()
+    ~~~~~~^^
+  File "C:\Users\hs\AppData\Local\Doubao\User Data\sandbox_runtime\bases\fa694f517e5995233c80a9a8db5212c2\python\Lib\site-packages\pyocd\core\session.py", line 689, in open
+    self._board.init()
+    ~~~~~~~~~~~~~~~~^^
+  File "C:\Users\hs\AppData\Local\Doubao\User Data\sandbox_runtime\bases\fa694f517e5995233c80a9a8db5212c2\python\Lib\site-packages\pyocd\board\board.py", line 152, in init
+    self.target.init()
+    ~~~~~~~~~~~~~~~~^^
+  File "C:\Users\hs\AppData\Local\Doubao\User Data\sandbox_runtime\bases\fa694f517e5995233c80a9a8db5212c2\python\Lib\site-packages\pyocd\coresight\coresight_target.py", line 132, in init
+    super().init()
+    ~~~~~~~~~~~~^^
+  File "C:\Users\hs\AppData\Local\Doubao\User Data\sandbox_runtime\bases\fa694f517e5995233c80a9a8db5212c2\python\Lib\site-packages\pyocd\core\soc_target.py", line 174, in init
+    seq.invoke()
+    ~~~~~~~~~~^^
+  File "C:\Users\hs\AppData\Local\Doubao\User Data\sandbox_runtime\bases\fa694f517e5995233c80a9a8db5212c2\python\Lib\site-packages\pyocd\utility\sequencer.py", line 213, in invoke
+    resultSequence.invoke()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\hs\AppData\Local\Doubao\User Data\sandbox_runtime\bases\fa694f517e5995233c80a9a8db5212c2\python\Lib\site-packages\pyocd\utility\sequencer.py", line 208, in invoke
+    resultSequence = call()
+  File "C:\Users\hs\AppData\Local\Doubao\User Data\sandbox_runtime\bases\fa694f517e5995233c80a9a8db5212c2\python\Lib\site-packages\pyocd\coresight\dap.py", line 481, in _connect
+    raise exceptions.Error(
+        "Target not detected. Check connection to target. Potentially reduce debug clock.") from err
+pyocd.core.exceptions.Error: Target not detected. Check connection to target. Potentially reduce debug clock.
